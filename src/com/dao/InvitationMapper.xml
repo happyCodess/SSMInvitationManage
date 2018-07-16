@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.InvitationMapper">
+  <!-- 分页查询帖子列表 -->
+  <select id="searchList" parameterType="com.vo.Pagination" resultType="com.pojo.Invitation">
+  		select t.id,t.title,t.summary,t.author,t.createDate from
+  		(select rownum as rn,i.* from
+  		(select * from INVITATION 
+  		<where>
+  			<if test="author!=null">
+  				and author like #{author}
+  			</if>
+  		</where>) i 
+  		where rownum &lt;#{endRow})t
+  		where t.rn &gt;#{startRow}
+  </select>
+  <!-- 查询总条数 -->
+  <select id="selectCountByParam" parameterType="com.vo.Pagination" resultType="java.lang.Integer">
+  		select count(id) from INVITATION
+  		<where>
+  			<if test="author!=null">
+  				and author like #{author} 
+  			</if>
+  		</where>
+  </select>
+  <!--添加帖子  -->
+<insert id="addInvitation" parameterType="com.pojo.Invitation" > 
+	<selectKey resultType="int" order="BEFORE" keyProperty="id"> 
+	select invitation_seq.NEXTVAL FROM dual 
+	</selectKey> 
+	insert into INVITATION
+    values (#{id},#{title},#{summary},#{author},#{createDate}) 
+</insert>
+  <!--修改帖子  -->
+<update id="updateInvitation" parameterType="com.pojo.Invitation" >
+        update INVITATION
+        <set>
+            <if test="title!=null">
+                title = #{title},
+            </if>
+            <if test="summary!=null">
+                summary = #{summary},
+            </if>
+            <if test="author!=null">
+                author = #{author},
+            </if>
+            <if test="createDate!=null">
+                createdate = #{createDate},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+  <!--删除帖子  -->
+  <delete id="deleteInvitation" parameterType="java.lang.Integer">
+  		delete from INVITATION where id=#{id}
+  </delete>
+  <!--Excel插入  -->
+<insert id="insertInfoBatch" parameterType="com.pojo.Invitation" > 
+	<selectKey resultType="int" order="BEFORE" keyProperty="id"> 
+	select invitation_seq.NEXTVAL FROM dual 
+	</selectKey> 
+	insert into INVITATION
+    values (#{id},#{title},#{summary},#{author},#{createDate}) 
+</insert>
+<!-- excel导入时批量插入数据 -->
+<!-- <insert id="insertInfoBatch" parameterType="java.util.List">
+           BEGIN
+           <foreach collection="list" item="item" index="index" separator=";" >
+               INSERT INTO INVITATION (id, title,summary, author, createdate) VALUES
+               ( #{item.id},#{item.title},#{item.summary},#{item.author},#{item.createDate} )
+           </foreach>
+           ;END ;
+</insert> -->
+<!--excel导出  -->
+ <select id="selectInvitation"  resultType="com.pojo.Invitation">
+  		select * from INVITATION
+  </select>
+  
+<!--word导出  -->
+ <select id="selectInvitations"  resultType="com.pojo.Invitation">
+  		select * from INVITATION
+  </select>
+</mapper>

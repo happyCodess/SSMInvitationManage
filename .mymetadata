@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="SSMInvitationManage"
+  id="myeclipse.1521557924543"
+  context-root="/SSMInvitationManage"
+  j2ee-spec="5.0"
+  archive="SSMInvitationManage.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

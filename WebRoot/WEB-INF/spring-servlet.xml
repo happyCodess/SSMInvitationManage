@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.0.xsd
+						http://www.springframework.org/schema/mvc
+					   http://www.springframework.org/schema/mvc/spring-mvc.xsd
+					   http://www.springframework.org/schema/util
+					   http://www.springframework.org/schema/util/spring-util.xsd">
+	<!-- 1、扫描src文件夹下的源代码包，目的是通过注解的方式进行依赖注入自动装配 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com"></context:component-scan>
+	<!-- 2、创建数据源 (替代之前的mybatis环境配置) -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="url" value="jdbc:oracle:thin:@192.168.3.174:1521/hsoa"></property>
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+		<property name="username" value="hsoa"></property>
+		<property name="password" value="password"></property>
+	</bean>
+	<!-- 3、 事务管理器管理数据源服务（替代之前的mybatis事务管理器） -->
+	<bean name="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 4、驱动声明式事务管理器 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- 5、视图解析器（springMVC实现前后台交互跳转的配置） -->
+	<bean name="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 6、配置SqlSessionFactoryBean (替代mybatis之前的创建会话工厂) -->
+	<bean name="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 7、扫描包下的dao接口和sql语句所在xml文件（替代mybatis之前的mappers引入sql映射文件） -->
+	<bean name="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.dao"></property>
+	</bean>
+	<!--excel上传文件配置 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- set the max upload size100MB -->
+		<property name="maxUploadSize">
+			<value>104857600</value>
+		</property>
+		<property name="maxInMemorySize">
+			<value>4096</value>
+		</property>
+		<property name="defaultEncoding">
+			<value>utf-8</value>
+		</property>
+	</bean>
+	<!--ftl转doc -->
+	<bean id="freeMarkerConfigurer"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/ftl/"></property><!-- freemark模板存放的位置 -->
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="default_encoding">UTF-8</prop><!-- freemark编码格式 -->
+				<prop key="locale">zh_CN</prop>
+				<prop key="number_format">0.##########</prop>
+				<prop key="template_update_delay">5</prop>
+				<prop key="url_escaping_charset">UTF-8</prop>
+				<prop key="boolean_format">true,false</prop>
+				<prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+				<prop key="date_format">yyyy-MM-dd</prop>
+				<prop key="time_format">HH:mm:ss</prop>
+				<prop key="whitespace_stripping">true</prop>
+			</props>
+
+		</property>
+
+	</bean> 
+   <!-- <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">  
+        <property name="templateLoaderPath" value="WEB-INF/ftl/" />  
+        <property name="defaultEncoding" value="UTF-8" />  
+    </bean>  --> 
+    <!-- freemarker视图解析器 -->  
+   <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">  
+        <property name="suffix" value=".ftl" />  
+        <property name="contentType" value="text/html;charset=UTF-8" />   
+    </bean>  
+    
+    
+    <!-- MVC Jackson转换器 -->
+	<!-- <mvc:annotation-driven>
+		<mvc:message-converters>
+			<ref bean="fastJsonHttpMessageConverter" />
+		</mvc:message-converters>
+	</mvc:annotation-driven> -->
+
+	<!-- JSON转换 -->
+	 <bean id="fastJsonHttpMessageConverter"
+		class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>application/json;charset=UTF-8</value>
+				<value>text/html;charset=UTF-8</value>
+				<value>application/x-www-form-urlencoded; charset=UTF-8</value>
+			</list>
+		</property>
+		<property name="features">
+			<util:list>
+				<value>WriteDateUseDateFormat</value>
+				<value>WriteNullBooleanAsFalse</value>
+				<value>WriteNullStringAsEmpty</value>
+				<value>WriteNullListAsEmpty</value>
+				<value>DisableCircularReferenceDetect</value>
+			</util:list>
+		</property>
+	</bean> 
+
+
+	
+</beans>
