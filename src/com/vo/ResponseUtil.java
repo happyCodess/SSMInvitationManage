@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ResponseUtil {
 	 public static void write(HttpServletResponse response,Object object)throws Exception{
 	        response.setContentType("text/html;charset=utf-8");
-	        PrintWriter out=response.getWriter();
+	        PrintWriter out=response.getWriter();//println()可以输出对象
+        	//outPrintWriter.write(JSONArray.toJSONString(resultMap));write()只能输出字符串或者html
 	        out.println(object);
 	        out.flush();
 	        out.close();
